@@ -3,10 +3,10 @@ import log4js, { Logger } from 'log4js';
 import mongoose from 'mongoose';
 
 import App from './app.js';
-import SettingsSchema from './models/settings.model.js';
+import SettingsModel from './models/settings.model.js';
 import { ISettingsSchema } from './types/models.types.js';
-import ApiRequestLimiterUtil from './util/apiRequestLimiter.util.js';
-import loggerUtil from './util/logger.util.js';
+import ApiRequestLimiterUtil from './utils/apiRequestLimiter.util.js';
+import loggerUtil from './utils/logger.util.js';
 
 class Server {
 	private readonly logger: Logger;
@@ -27,7 +27,7 @@ class Server {
 			if (!error) this.logger.error(error);
 		});
 
-		return (await SettingsSchema.find().lean())[0];
+		return (await SettingsModel.find().lean())[0];
 	};
 
 	private readonly init = (settings: ISettingsSchema) => {

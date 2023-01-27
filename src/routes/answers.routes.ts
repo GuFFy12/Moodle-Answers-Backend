@@ -1,18 +1,19 @@
 import { Router } from 'express';
 import log4js, { Logger } from 'log4js';
 
-import AnswersControllers from '../controllers/answers.controllers.js';
+import AnswersController from '../controllers/answers.controller.js';
 import getAnswersValidator from '../validators/getAnswers.validator.js';
 import postAnswersValidator from '../validators/postAnswers.validator.js';
 
 export default class AnswersRoutes {
-	public readonly answersControllers: AnswersControllers;
 	private readonly logger: Logger;
+
+	public readonly answersController: AnswersController;
 
 	public constructor() {
 		this.logger = log4js.getLogger(this.constructor.name);
 
-		this.answersControllers = new AnswersControllers();
+		this.answersController = new AnswersController();
 	}
 
 	public init = () => {
@@ -20,8 +21,8 @@ export default class AnswersRoutes {
 
 		const router: Router = Router();
 
-		router.post('/postAnswers', postAnswersValidator, this.answersControllers.postAnswers);
-		router.get('/getAnswers', getAnswersValidator, this.answersControllers.getAnswers);
+		router.post('/postAnswers', postAnswersValidator, this.answersController.postAnswers);
+		router.get('/getAnswers', getAnswersValidator, this.answersController.getAnswers);
 
 		return router;
 	};

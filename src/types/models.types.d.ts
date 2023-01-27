@@ -19,6 +19,7 @@ export interface IAnswerSchema {
 export interface IQuestionSchema {
 	readonly cmId: number;
 	readonly questionId: string;
+	readonly createdAt: Date;
 }
 
 export interface IUserSchema {

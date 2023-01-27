@@ -1,11 +1,11 @@
 export interface IGetAnswersBody {
-	cmId: string;
+	cmId: number;
 	questionId: string;
 }
 
 export interface IPostAnswerBody {
 	readonly cmId: number;
-	readonly questionId: number;
+	readonly questionId: string;
 	readonly percent?: number;
 	readonly answers: Record<string, string>;
 }

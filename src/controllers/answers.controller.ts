@@ -6,7 +6,7 @@ import QuestionModel from '../models/question.model.js';
 import UserModel from '../models/user.model.js';
 import { IGetAnswersBody, IPostAnswerBody } from '../types/controllers.types.js';
 
-export default class AnswersControllers {
+export default class AnswersController {
 	private readonly logger: Logger;
 
 	public constructor() {
@@ -59,7 +59,7 @@ export default class AnswersControllers {
 
 			const answersGrouped = this.groupByQuestion(answers);
 			if (!answersGrouped || Object.keys(answersGrouped).length === 0)
-				return res.status(400).json({ message: 'No answers provided' });
+				return res.status(422).json({ message: 'No answers provided' });
 
 			const user = await UserModel.findOneAndUpdate({ ip: req.clientIp }, {}, { upsert: true, new: true });
 

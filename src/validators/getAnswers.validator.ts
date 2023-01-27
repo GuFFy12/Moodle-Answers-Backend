@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { check, validationResult } from 'express-validator';
+import { query, validationResult } from 'express-validator';
 
 export default [
-	check('cmId', 'CM ID is required').exists().toInt().isInt({ min: 1 }),
-	check('questionId', 'Question ID is required')
+	query('cmId', 'CM ID is required').exists().toInt().isInt({ min: 1 }),
+	query('questionId', 'Question ID is required')
 		.exists()
 		.matches(/q\d+:\d+/),
 	(req: Request, res: Response, next: NextFunction) => {

@@ -11,7 +11,7 @@ export default (err: IHttpException, req: Request, res: Response, next: NextFunc
 		err.status = 500;
 		err.message = 'Something went wrong on server';
 	}
-	res.status(err.status).send({ message: err.message, code: err.status });
+	res.status(err.status).json({ message: err.message, code: err.status });
 
 	next();
 };

@@ -13,22 +13,17 @@ export default class ApiRequestLimiterUtil {
 		return rateLimit({
 			windowMs: this.windowMs,
 			max: (req) => {
-				if (req.clientIp === 'localhost') {
-					return 0;
-				} else {
-					return this.max;
-				}
+				if (req.clientIp === 'localhost' || req.method === 'GET') return 0;
+
+				return this.max;
 			},
 			handler: (request, response) => {
-				return response
-					.status(429)
-					.setHeader('content-type', 'application/json')
-					.send(
-						JSON.stringify({
-							message: 'Too many requests, please try again later',
-							code: 429,
-						})
-					);
+				return response.status(429).json(
+					JSON.stringify({
+						message: 'Too many requests, please try again later',
+						code: 429,
+					})
+				);
 			},
 			keyGenerator: (req) => {
 				return req.clientIp;

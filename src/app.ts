@@ -5,16 +5,15 @@ import helmet from 'helmet';
 import log4js, { Logger } from 'log4js';
 
 import AnswersRoutes from './routes/answers.routes.js';
-import ApiRequestLimiterUtil from './util/apiRequestLimiter.util.js';
-import errorHandler from './util/errorHandler.util.js';
-import ipParser from './util/ipParser.util.js';
+import ApiRequestLimiterUtil from './utils/apiRequestLimiter.util.js';
+import errorHandler from './utils/errorHandler.util.js';
+import ipParser from './utils/ipParser.util.js';
 
 export default class App {
 	private readonly logger: Logger;
 
-	private readonly port: number;
-
 	private readonly app: core.Express;
+	private readonly port: number;
 	private readonly apiRequestLimiterUtil: ApiRequestLimiterUtil;
 	private readonly answersRoutes: AnswersRoutes;
 
