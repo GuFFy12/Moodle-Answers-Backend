@@ -17,7 +17,7 @@ export default class AnswersControllers {
 		void (async () => {
 			this.logger.info('getAnswers called');
 
-			const { cmId, questionId } = req.body as IGetAnswersBody;
+			const { cmId, questionId } = req.query as unknown as IGetAnswersBody;
 
 			const question = await QuestionModel.findOneAndUpdate(
 				{ cmId, questionId },
@@ -30,7 +30,6 @@ export default class AnswersControllers {
 					{
 						$match: {
 							question: question._id,
-							percent: { $gte: 80 },
 						},
 					},
 					{
@@ -42,7 +41,7 @@ export default class AnswersControllers {
 						},
 					},
 					{
-						$sort: { percent: -1, count: -1 },
+						$sort: { count: -1, percent: -1 },
 					},
 					{
 						$limit: 3,

@@ -44,7 +44,7 @@ export default class App {
 		this.app.use(this.apiRequestLimiterUtil.init());
 		this.app.use(log4js.connectLogger(log4js.getLogger('Http'), { level: 'auto' }));
 
-		this.app.use('/', this.answersRoutes.init()); //TODO: replace to /api/v1, now create it in nginx config
+		this.app.use('', this.answersRoutes.init());
 
 		this.app.use(errorHandler);
 	};

@@ -3,7 +3,9 @@ import { check, validationResult } from 'express-validator';
 
 export default [
 	check('cmId', 'CM ID is required').exists().toInt().isInt({ min: 1 }),
-	check('questionId', 'Question ID is required').exists().isString(),
+	check('questionId', 'Question ID is required')
+		.exists()
+		.matches(/q\d+:\d+/),
 	(req: Request, res: Response, next: NextFunction) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });

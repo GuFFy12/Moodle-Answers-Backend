@@ -11,7 +11,7 @@ export interface ISettingsSchema {
 export interface IAnswerSchema {
 	readonly user: mongoose.Types.ObjectId;
 	readonly question: mongoose.Types.ObjectId;
-	readonly percent: number;
+	readonly percent?: number;
 	readonly answer: string[];
 	readonly createdAt: Date;
 }
