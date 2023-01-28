@@ -53,20 +53,24 @@ export default class AnswersController {
 		void (async () => {
 			this.logger.info('postAnswers called');
 
-			const { cmId, percent, answers } = req.body as IPostAnswerBody;
+			const { cmId, percent, answersData } = req.body as IPostAnswerBody;
 
 			const user = await UserModel.findOneAndUpdate({ ip: req.clientIp }, {}, { upsert: true, new: true });
 
-			for (const question of Object.keys(answers)) {
+			for (const answerData of answersData) {
 				const questionId = (
-					await QuestionModel.findOneAndUpdate({ cmId, question }, {}, { upsert: true, new: true })
+					await QuestionModel.findOneAndUpdate(
+						{ cmId, question: answerData.question },
+						{},
+						{ upsert: true, new: true }
+					)
 				)._id;
 
 				await AnswerModel.create({
 					user: user._id,
 					question: questionId,
 					percent,
-					answer: answers[question],
+					answer: answerData.answer,
 				});
 			}
 

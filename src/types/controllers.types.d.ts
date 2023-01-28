@@ -6,5 +6,10 @@ export interface IGetAnswersBody {
 export interface IPostAnswerBody {
 	readonly cmId: number;
 	readonly percent?: number;
-	readonly answers: Record<string, string[]>;
+	readonly answersData: IAnswer[];
+}
+
+export interface IAnswer {
+	question: string;
+	answer: string[];
 }
