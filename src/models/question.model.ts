@@ -7,7 +7,7 @@ const { model, Schema } = mongoose;
 const QuestionSchema = new Schema(
 	{
 		cmId: Schema.Types.Number,
-		questionId: Schema.Types.String,
+		question: Schema.Types.String,
 	},
 	{ timestamps: { createdAt: true, updatedAt: false } }
 );

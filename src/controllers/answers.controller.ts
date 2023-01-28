@@ -17,19 +17,17 @@ export default class AnswersController {
 		void (async () => {
 			this.logger.info('getAnswers called');
 
-			const { cmId, questionId } = req.query as unknown as IGetAnswersBody;
+			const { cmId, question } = req.query as unknown as IGetAnswersBody;
 
-			const question = await QuestionModel.findOneAndUpdate(
-				{ cmId, questionId },
-				{},
-				{ upsert: true, new: true }
-			);
+			const questionId = (
+				await QuestionModel.findOneAndUpdate({ cmId, question }, {}, { upsert: true, new: true })
+			)._id;
 
 			return res.status(200).json(
 				await AnswerModel.aggregate([
 					{
 						$match: {
-							question: question._id,
+							question: questionId,
 						},
 					},
 					{
@@ -57,44 +55,22 @@ export default class AnswersController {
 
 			const { cmId, percent, answers } = req.body as IPostAnswerBody;
 
-			const answersGrouped = this.groupByQuestion(answers);
-			if (!answersGrouped || Object.keys(answersGrouped).length === 0)
-				return res.status(422).json({ message: 'No answers provided' });
-
 			const user = await UserModel.findOneAndUpdate({ ip: req.clientIp }, {}, { upsert: true, new: true });
 
-			for (const questionId of Object.keys(answersGrouped)) {
-				const question = await QuestionModel.findOneAndUpdate(
-					{ cmId, questionId },
-					{},
-					{ upsert: true, new: true }
-				);
+			for (const question of Object.keys(answers)) {
+				const questionId = (
+					await QuestionModel.findOneAndUpdate({ cmId, question }, {}, { upsert: true, new: true })
+				)._id;
 
 				await AnswerModel.create({
 					user: user._id,
-					question: question._id,
+					question: questionId,
 					percent,
-					answer: answersGrouped[questionId],
+					answer: answers[question],
 				});
 			}
 
 			return res.status(200).json({ message: 'Answers saved' });
 		})();
-	};
-
-	private readonly groupByQuestion = (answers: Record<string, string>) => {
-		return Object.keys(answers).reduce((result: Record<string, Record<string, string>> = {}, question) => {
-			if (!/q\d+:\d+_\w+/.test(question)) return;
-
-			const questionId = question.split('_')[0];
-
-			if (!result[questionId]) {
-				result[questionId] = {};
-			}
-
-			result[questionId][question] = answers[question];
-
-			return result;
-		}, {});
 	};
 }
