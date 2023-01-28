@@ -39,7 +39,7 @@ export default class AnswersController {
 						},
 					},
 					{
-						$sort: { count: -1, percent: -1 },
+						$sort: { percent: -1, count: -1 },
 					},
 					{
 						$limit: 3,
