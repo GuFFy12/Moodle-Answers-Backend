@@ -31,7 +31,7 @@ class Server {
 	};
 
 	private readonly init = (settings: ISettingsSchema) => {
-		loggerUtil(settings.maxLogSize, settings.maxLogBackups);
+		loggerUtil();
 
 		this.logger.info('Init app...');
 
