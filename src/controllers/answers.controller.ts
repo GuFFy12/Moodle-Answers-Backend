@@ -59,7 +59,11 @@ export default class AnswersController {
 
 			const { cmId, percent, questionsData } = req.body as IPostAnswerBody;
 
-			const user = await UserModel.findOneAndUpdate({ ip: req.clientIp }, {}, { upsert: true, new: true });
+			const user = await UserModel.findOneAndUpdate(
+				{ ip: req.clientIp },
+				{ updatedAt: Date.now() },
+				{ upsert: true, new: true }
+			);
 
 			for (const questionData of questionsData) {
 				const questionId = (

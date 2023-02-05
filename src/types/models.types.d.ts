@@ -26,4 +26,5 @@ export interface IQuestionSchema {
 export interface IUserSchema {
 	readonly ip: string;
 	readonly createdAt: Date;
+	updatedAt: Date;
 }
