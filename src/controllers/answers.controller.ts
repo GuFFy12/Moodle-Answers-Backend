@@ -57,7 +57,7 @@ export default class AnswersController {
 
 			const user = await UserModel.findOneAndUpdate(
 				{ ip: req.clientIp },
-				{ updatedAt: Date.now() },
+				{ $set: { updatedAt: Date.now() } },
 				{ upsert: true, new: true }
 			);
 
