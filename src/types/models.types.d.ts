@@ -12,13 +12,14 @@ export interface IAnswerSchema {
 	readonly user: mongoose.Types.ObjectId;
 	readonly question: mongoose.Types.ObjectId;
 	readonly percent?: number;
-	readonly answer: string[];
+	readonly answers: string[];
 	readonly createdAt: Date;
 }
 
 export interface IQuestionSchema {
 	readonly cmId: number;
 	readonly question: string;
+	readonly answersOptions: string[];
 	readonly createdAt: Date;
 }
 

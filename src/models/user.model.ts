@@ -8,7 +8,7 @@ const UserSchema = new Schema(
 	{
 		ip: Schema.Types.String,
 	},
-	{ timestamps: { createdAt: true, updatedAt: false } }
+	{ timestamps: true }
 );
 
 export default model<IUserSchema>('Users', UserSchema);

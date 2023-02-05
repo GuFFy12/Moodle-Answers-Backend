@@ -9,7 +9,7 @@ const AnswerSchema = new Schema(
 		user: { type: Schema.Types.ObjectId, ref: 'Users' },
 		question: { type: Schema.Types.ObjectId, ref: 'Questions' },
 		percent: Schema.Types.Number,
-		answer: [Schema.Types.String],
+		answers: [Schema.Types.String],
 	},
 	{ timestamps: { createdAt: true, updatedAt: false } }
 );

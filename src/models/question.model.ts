@@ -8,6 +8,7 @@ const QuestionSchema = new Schema(
 	{
 		cmId: Schema.Types.Number,
 		question: Schema.Types.String,
+		answersOptions: [Schema.Types.String],
 	},
 	{ timestamps: { createdAt: true, updatedAt: false } }
 );

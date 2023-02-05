@@ -21,8 +21,8 @@ export default class AnswersRoutes {
 
 		const router: Router = Router();
 
-		router.post('/postAnswers', postAnswersValidator, this.answersController.postAnswers);
-		router.get('/getAnswers', getAnswersValidator, this.answersController.getAnswers);
+		router.post('/postQuizData', postAnswersValidator, this.answersController.postAnswers);
+		router.post('/getAnswerData', getAnswersValidator, this.answersController.getAnswers);
 
 		return router;
 	};

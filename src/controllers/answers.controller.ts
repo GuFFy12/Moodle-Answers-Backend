@@ -17,10 +17,14 @@ export default class AnswersController {
 		void (async () => {
 			this.logger.info('getAnswers called');
 
-			const { cmId, question } = req.query as unknown as IGetAnswersBody;
+			const { cmId, question, answersOptions } = req.body as IGetAnswersBody;
 
 			const questionId = (
-				await QuestionModel.findOneAndUpdate({ cmId, question }, {}, { upsert: true, new: true })
+				await QuestionModel.findOneAndUpdate(
+					{ cmId, question, answersOptions },
+					{},
+					{ upsert: true, new: true }
+				)
 			)._id;
 
 			return res.status(200).json(
@@ -32,7 +36,7 @@ export default class AnswersController {
 					},
 					{
 						$group: {
-							_id: '$answer',
+							_id: '$answers',
 							percent: { $avg: '$percent' },
 							count: { $sum: 1 },
 							updatedAt: { $max: '$createdAt' },
@@ -53,14 +57,14 @@ export default class AnswersController {
 		void (async () => {
 			this.logger.info('postAnswers called');
 
-			const { cmId, percent, answersData } = req.body as IPostAnswerBody;
+			const { cmId, percent, questionsData } = req.body as IPostAnswerBody;
 
 			const user = await UserModel.findOneAndUpdate({ ip: req.clientIp }, {}, { upsert: true, new: true });
 
-			for (const answerData of answersData) {
+			for (const questionData of questionsData) {
 				const questionId = (
 					await QuestionModel.findOneAndUpdate(
-						{ cmId, question: answerData.question },
+						{ cmId, question: questionData.question, answersOptions: questionData.answersOptions },
 						{},
 						{ upsert: true, new: true }
 					)
@@ -70,11 +74,11 @@ export default class AnswersController {
 					user: user._id,
 					question: questionId,
 					percent,
-					answer: answerData.answer,
+					answers: questionData.answers,
 				});
 			}
 
-			return res.status(200).json({ message: 'Answers saved' });
+			return res.status(200).json({ message: 'Quiz Data saved' });
 		})();
 	};
 }

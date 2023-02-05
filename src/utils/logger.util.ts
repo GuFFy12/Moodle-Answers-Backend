@@ -1,28 +1,17 @@
 import log4js from 'log4js';
 
-export default (maxLogSize: number, maxLogBackups: number) => {
+export default () => {
 	log4js.configure({
 		appenders: {
 			out: { type: 'stdout' },
-			log: {
-				type: 'file',
-				filename: './logs/app.log',
-				maxLogSize: maxLogSize,
-				backups: maxLogBackups,
-				compress: true,
-				layout: {
-					type: 'pattern',
-					pattern: '%d %p %c %m',
-				},
-			},
 		},
 		categories: {
-			default: { appenders: ['out', 'log'], level: 'all' },
-			Server: { appenders: ['out', 'log'], level: 'all' },
-			App: { appenders: ['out', 'log'], level: 'all' },
-			Http: { appenders: ['out', 'log'], level: 'all' },
-			AnswersRoutes: { appenders: ['out', 'log'], level: 'all' },
-			AnswersControllers: { appenders: ['out', 'log'], level: 'all' },
+			default: { appenders: ['out'], level: 'all' },
+			Server: { appenders: ['out'], level: 'all' },
+			App: { appenders: ['out'], level: 'all' },
+			Http: { appenders: ['out'], level: 'all' },
+			AnswersRoutes: { appenders: ['out'], level: 'all' },
+			AnswersControllers: { appenders: ['out'], level: 'all' },
 		},
 		pm2: true,
 	});
