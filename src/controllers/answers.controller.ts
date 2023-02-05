@@ -15,8 +15,6 @@ export default class AnswersController {
 
 	public readonly getAnswers = (req: Request, res: Response) => {
 		void (async () => {
-			this.logger.info('getAnswers called');
-
 			const { cmId, question, answersOptions } = req.body as IGetAnswersBody;
 
 			const questionId = (
@@ -55,8 +53,6 @@ export default class AnswersController {
 
 	public readonly postAnswers = (req: Request, res: Response) => {
 		void (async () => {
-			this.logger.info('postAnswers called');
-
 			const { cmId, percent, questionsData } = req.body as IPostAnswerBody;
 
 			const user = await UserModel.findOneAndUpdate(
