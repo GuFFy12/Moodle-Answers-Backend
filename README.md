@@ -1,3 +1,3 @@
-# USATU-SDO-Answers-Backend
+# UGATU-SDO-Answers-Backend
 
-USATU SDO Answers Backend
+UGATU SDO Answers Backend
