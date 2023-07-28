@@ -1,10 +1,12 @@
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
-	ArrayMaxSize,
 	ArrayMinSize,
 	IsArray,
+	IsDefined,
 	IsNotEmpty,
+	IsNotEmptyObject,
 	IsNumber,
+	IsObject,
 	IsOptional,
 	IsString,
 	Max,
@@ -36,16 +38,40 @@ export class PathDto {
 	name: string;
 }
 
+export class PathsDto {
+	@IsDefined()
+	@IsNotEmptyObject()
+	@IsObject()
+	@ValidateNested()
+	@Type(() => PathDto)
+	course: PathDto;
+
+	@IsDefined()
+	@IsNotEmptyObject()
+	@IsObject()
+	@ValidateNested()
+	@Type(() => PathDto)
+	section: PathDto;
+
+	@IsDefined()
+	@IsNotEmptyObject()
+	@IsObject()
+	@ValidateNested()
+	@Type(() => PathDto)
+	module: PathDto;
+}
+
 export class PostQuizDataDto {
 	@IsNumber()
 	@Min(1)
 	userId: number;
 
-	paths: {
-		course: PathDto;
-		section: PathDto;
-		module: PathDto;
-	};
+	@IsDefined()
+	@IsNotEmptyObject()
+	@IsObject()
+	@ValidateNested()
+	@Type(() => PathsDto)
+	paths: PathsDto;
 
 	@IsNumber()
 	@IsOptional()
