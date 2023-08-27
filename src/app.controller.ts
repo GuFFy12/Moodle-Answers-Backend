@@ -11,49 +11,41 @@ export class AppController {
 
 	@Get('getAnswerData')
 	@HttpCode(200)
-	async getAnswersData(@Query() getAnswersDataDto: GetAnswersDataDto) {
+	getAnswersData(@Query() { moduleId, question_questionType_answerOptions_md5, skip, take }: GetAnswersDataDto) {
 		return this.answersService.getAnswersGroupedByQuestion(
 			{
-				question_answerOptions_md5: getAnswersDataDto.question_answerOptions_md5,
+				moduleId,
+				question_questionType_answerOptions_md5,
 			},
-			getAnswersDataDto.skip,
-			getAnswersDataDto.take,
+			{ skip, take },
 		);
 	}
 
 	@Post('postQuizData')
 	@Throttle(3, 60)
-	async postQuizData(@Body() postQuizDataDto: PostQuizDataDto, @Ip() ip: string) {
-		const user = await this.answersService.upsertUser({ id: postQuizDataDto.userId, lastIp: ip });
-
-		const course = await this.answersService.upsertCourse({
-			id: postQuizDataDto.paths.course.id,
-			name: postQuizDataDto.paths.course.name,
-		});
-		const section = await this.answersService.upsertSection({
-			courseId: course.id,
-			sectionId: postQuizDataDto.paths.section.id,
-			name: postQuizDataDto.paths.section.name,
-		});
-		const module = await this.answersService.upsertModule({
-			sectionId: section.id,
-			id: postQuizDataDto.paths.module.id,
-			name: postQuizDataDto.paths.module.name,
-		});
-
-		return await Promise.all(
-			postQuizDataDto.questionsData.map((questionData) => {
-				return this.answersService.upsertQuestionAndCreateAnswer(
-					module.id,
-					questionData.question,
-					questionData.answerOptions,
-					{
-						userId: user.id,
-						percent: postQuizDataDto.percent,
-						answers: questionData.answers,
-					},
-				);
-			}),
+	postQuizData(
+		@Body() { userId, paths: { course, section, module }, percent, questionsData }: PostQuizDataDto,
+		@Ip() ip: string,
+	) {
+		return this.answersService.upsertUserPathsQuestionAndCreateAnswers(
+			{
+				id: userId,
+				lastIp: ip,
+			},
+			{
+				id: course.id,
+				name: course.name,
+			},
+			{
+				sectionId: section.id,
+				name: section.name,
+			},
+			{
+				id: module.id,
+				name: module.name,
+			},
+			percent,
+			questionsData,
 		);
 	}
 }

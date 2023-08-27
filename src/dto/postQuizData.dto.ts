@@ -2,22 +2,21 @@ import { Type } from 'class-transformer';
 import {
 	ArrayMinSize,
 	IsArray,
-	IsDefined,
-	IsNotEmpty,
-	IsNotEmptyObject,
 	IsNumber,
 	IsObject,
-	IsOptional,
 	IsString,
 	Max,
 	Min,
+	ValidateIf,
 	ValidateNested,
 } from 'class-validator';
 
 export class QuestionDataDto {
 	@IsString()
-	@IsNotEmpty()
 	question: string;
+
+	@IsString()
+	questionType: string;
 
 	@IsArray()
 	@IsString({ each: true })
@@ -34,27 +33,20 @@ export class PathDto {
 	id: number;
 
 	@IsString()
-	@IsNotEmpty()
 	name: string;
 }
 
 export class PathsDto {
-	@IsDefined()
-	@IsNotEmptyObject()
 	@IsObject()
 	@ValidateNested()
 	@Type(() => PathDto)
 	course: PathDto;
 
-	@IsDefined()
-	@IsNotEmptyObject()
 	@IsObject()
 	@ValidateNested()
 	@Type(() => PathDto)
 	section: PathDto;
 
-	@IsDefined()
-	@IsNotEmptyObject()
 	@IsObject()
 	@ValidateNested()
 	@Type(() => PathDto)
@@ -63,21 +55,19 @@ export class PathsDto {
 
 export class PostQuizDataDto {
 	@IsNumber()
-	@Min(1)
+	@Min(0)
 	userId: number;
 
-	@IsDefined()
-	@IsNotEmptyObject()
 	@IsObject()
 	@ValidateNested()
 	@Type(() => PathsDto)
 	paths: PathsDto;
 
 	@IsNumber()
-	@IsOptional()
+	@ValidateIf((object, value) => value !== null)
 	@Min(0)
 	@Max(100)
-	percent?: number | null;
+	percent: number | null;
 
 	@IsArray()
 	@ArrayMinSize(1)

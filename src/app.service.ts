@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Md5 } from 'ts-md5';
 
+import { PathsDto, QuestionDataDto } from './dto/postQuizData.dto';
 import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class AppService {
 	constructor(private prisma: PrismaService) {}
 
-	getAnswersGroupedByQuestion(questionWhereInput: Prisma.QuestionWhereInput, skip = 0, take = 5) {
-		//TODO: Nulls last
-		return this.prisma.answer.groupBy({
+	async getAnswersGroupedByQuestion(questionWhereInput: Prisma.QuestionWhereInput, { skip = 0, take = 5 }) {
+		const groupedAnswers = this.prisma.answer.groupBy({
 			by: ['answers'],
 			where: { question: questionWhereInput },
 			orderBy: [{ _count: { answers: 'desc' } }, { _avg: { percent: 'desc' } }],
@@ -20,76 +20,107 @@ export class AppService {
 			skip,
 			take,
 		});
+
+		const answersCount = this.prisma.answer.count({ where: { question: questionWhereInput } });
+
+		return Object.fromEntries(
+			await Promise.all(
+				Object.entries({
+					groupedAnswers,
+					answersCount,
+				}).map(async ([k, v]) => [k, await v]),
+			),
+		);
 	}
 
-	upsertUser(userCreateWithoutAnswersInput: Prisma.UserUncheckedCreateWithoutAnswersInput) {
-		return this.prisma.user.upsert({
-			where: { id: userCreateWithoutAnswersInput.id },
-			create: userCreateWithoutAnswersInput,
-			update: { lastIp: userCreateWithoutAnswersInput.lastIp },
+	async upsertUserPathsQuestionAndCreateAnswers(
+		userCreateInput: Prisma.UserCreateInput,
+		courseCreateInput: Prisma.CourseCreateInput,
+		sectionCreateInput: Prisma.SectionCreateWithoutCourseInput,
+		moduleCreateInput: Prisma.ModuleCreateWithoutSectionInput,
+		percent: number | null,
+		questionsData: QuestionDataDto[],
+	) {
+		const user = await this.prisma.user.upsert({
+			where: { id: userCreateInput.id },
+			create: userCreateInput,
+			update: { lastIp: userCreateInput.lastIp },
 		});
-	}
 
-	upsertCourse(courseUncheckedCreateInput: Prisma.CourseUncheckedCreateInput) {
-		return this.prisma.course.upsert({
-			where: { id: courseUncheckedCreateInput.id },
-			create: courseUncheckedCreateInput,
+		const course = await this.prisma.course.upsert({
+			where: { id: courseCreateInput.id },
+			create: courseCreateInput,
 			update: {},
 		});
-	}
 
-	upsertSection(sectionUncheckedCreateInput: Prisma.SectionUncheckedCreateInput) {
-		return this.prisma.section.upsert({
+		const section = await this.prisma.section.upsert({
 			where: {
 				courseId_sectionId: {
-					courseId: sectionUncheckedCreateInput.courseId,
-					sectionId: sectionUncheckedCreateInput.sectionId,
+					courseId: course.id,
+					sectionId: sectionCreateInput.sectionId,
 				},
-			},
-			create: sectionUncheckedCreateInput,
-			update: {},
-		});
-	}
-
-	upsertModule(moduleUncheckedCreateInput: Prisma.ModuleUncheckedCreateInput) {
-		return this.prisma.module.upsert({
-			where: { id: moduleUncheckedCreateInput.id },
-			create: moduleUncheckedCreateInput,
-			update: {},
-		});
-	}
-
-	async upsertQuestionAndCreateAnswer(
-		moduleId: number,
-		question: string,
-		answerOptions: string[],
-		answerCreateManyQuestionInput: Prisma.AnswerCreateManyQuestionInput,
-	) {
-		const question_answerOptions_md5 = Md5.hashStr(question + answerOptions.join());
-
-		return this.prisma.question.upsert({
-			where: {
-				moduleId_question_answerOptions_md5: { moduleId, question_answerOptions_md5 },
 			},
 			create: {
-				moduleId,
-				question_answerOptions_md5,
-				question,
-				answerOptions,
-				answers: {
-					create: answerCreateManyQuestionInput,
-				},
+				courseId: course.id,
+				sectionId: sectionCreateInput.sectionId,
+				name: sectionCreateInput.name,
 			},
-			update: {
-				answers: {
-					create: answerCreateManyQuestionInput,
-				},
-			},
-			select: {
-				moduleId: true,
-				question: true,
-				answerOptions: true,
-			},
+			update: {},
 		});
+
+		const module = await this.prisma.module.upsert({
+			where: { id: moduleCreateInput.id },
+			create: {
+				sectionId: section.id,
+				id: moduleCreateInput.id,
+				name: moduleCreateInput.name,
+			},
+			update: {},
+		});
+
+		return Promise.all(
+			questionsData.map((questionData) => {
+				const question_questionType_answerOptions_md5 = Md5.hashStr(
+					questionData.question + questionData.questionType + questionData.answerOptions.join(),
+				);
+
+				return this.prisma.question.upsert({
+					where: {
+						moduleId_question_questionType_answerOptions_md5: {
+							moduleId: module.id,
+							question_questionType_answerOptions_md5,
+						},
+					},
+					create: {
+						moduleId: module.id,
+						question_questionType_answerOptions_md5,
+						question: questionData.question,
+						questionType: questionData.questionType,
+						answerOptions: questionData.answerOptions,
+						answers: {
+							create: {
+								userId: user.id,
+								percent,
+								answers: questionData.answers,
+							},
+						},
+					},
+					update: {
+						answers: {
+							create: {
+								userId: user.id,
+								percent,
+								answers: questionData.answers,
+							},
+						},
+					},
+					select: {
+						moduleId: true,
+						question: true,
+						answerOptions: true,
+					},
+				});
+			}),
+		);
 	}
 }

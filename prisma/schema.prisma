@@ -41,15 +41,16 @@ model Module {
 }
 
 model Question {
-  id                         Int      @id @default(autoincrement())
-  module                     Module   @relation(fields: [moduleId], references: [id])
-  moduleId                   Int
-  question                   String
-  answerOptions              String[]
-  question_answerOptions_md5 String   @db.Uuid
-  answers                    Answer[]
+  id                                      Int      @id @default(autoincrement())
+  module                                  Module   @relation(fields: [moduleId], references: [id])
+  moduleId                                Int
+  question                                String
+  questionType                            String
+  answerOptions                           String[]
+  question_questionType_answerOptions_md5 String   @db.Uuid
+  answers                                 Answer[]
 
-  @@unique([moduleId, question_answerOptions_md5])
+  @@unique([moduleId, question_questionType_answerOptions_md5])
 }
 
 model Answer {
@@ -64,7 +65,6 @@ model Answer {
 }
 
 model Session {
-  id    Int    @id @default(autoincrement())
-  key   String @unique
-  value String
+  telegramId          String @id
+  checkedModulesCount Int
 }

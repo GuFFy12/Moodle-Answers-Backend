@@ -8,7 +8,7 @@ export class GetAnswersDataDto {
 
 	@IsString()
 	@IsNotEmpty()
-	question_answerOptions_md5: string;
+	question_questionType_answerOptions_md5: string;
 
 	@IsNumber()
 	@ValidateIf((object, value) => value !== undefined)

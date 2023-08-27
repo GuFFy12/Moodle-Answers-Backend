@@ -9,8 +9,7 @@ import { PrismaService } from './prisma.service';
 async function bootstrap() {
 	const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
-	const prismaService = app.get(PrismaService);
-	await prismaService.enableShutdownHooks(app);
+	app.get(PrismaService);
 
 	app.useGlobalPipes(
 		new ValidationPipe({
